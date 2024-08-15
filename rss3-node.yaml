@@ -153,7 +153,7 @@ spec:
           template: PREBUILT
           spec:
             source:
-                image: ghcr.io/rss3-network/node:v0.5.32
+                image: ghcr.io/rss3-network/node:v0.5.33
                 command:
                     - ./node
                     - --module=broadcaster
@@ -164,8 +164,9 @@ spec:
                     default: ${SIGNATURE}
                 NODE_DISCOVERY_SERVER_ACCESS_TOKEN:
                     default: ${PASSWORD}
+                # TODO Should use ${ZEABUR_WEB_URL} but not working for now
                 NODE_DISCOVERY_SERVER_ENDPOINT:
-                    default: ${ZEABUR_WEB_URL}
+                    default: https://${WEB_URL}.zeabur.app
                 NODE_DISCOVERY_SERVER_GLOBAL_INDEXER_ENDPOINT:
                     default: https://gi.rss3.dev
                 NODE_OBSERVABILITY_OPENTELEMETRY_METRICS_ENABLE:
@@ -177,7 +178,7 @@ spec:
           template: PREBUILT
           spec:
             source:
-                image: ghcr.io/rss3-network/node:v0.5.32
+                image: ghcr.io/rss3-network/node:v0.5.33
                 command:
                     - ./node
                     - --module=core
@@ -194,7 +195,7 @@ spec:
                     default: ${SIGNATURE}
                 NODE_DISCOVERY_SERVER_ACCESS_TOKEN:
                     default: ${PASSWORD}
-                NODE_DISCOVERY_SERVER_ENDPOINT:
+                PUBLIC_URL:
                     default: ${ZEABUR_WEB_URL}
                 NODE_DISCOVERY_SERVER_GLOBAL_INDEXER_ENDPOINT:
                     default: https://gi.rss3.dev
@@ -212,7 +213,7 @@ spec:
           template: PREBUILT
           spec:
             source:
-                image: ghcr.io/rss3-network/node:v0.5.32
+                image: ghcr.io/rss3-network/node:v0.5.33
                 command:
                     - ./node
                     - --module=monitor
@@ -228,7 +229,7 @@ spec:
           template: PREBUILT
           spec:
             source:
-                image: ghcr.io/rss3-network/node:v0.5.32
+                image: ghcr.io/rss3-network/node:v0.5.33
                 command:
                     - ./node
                     - --worker.id=vsl-core
