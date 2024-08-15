@@ -137,6 +137,21 @@ spec:
                     default: ${REDIS_CONNECTION_STRING}
                     expose: true
                     readonly: true
+        # - name: RSSHub
+        #   icon: https://docs.rsshub.app/logo.png
+        #   template: PREBUILT
+        #   spec:
+        #     source:
+        #         image: diygod/rsshub
+        #     ports:
+        #         - id: web
+        #           port: 1200
+        #           type: HTTP
+        #     env:
+        #         CACHE_TYPE:
+        #             default: redis
+        #         REDIS_URL:
+        #             default: ${REDIS_URI}
         - name: RSS3-Node-Broadcaster
           icon: https://explorer.rss3.io/rss3.svg
           template: PREBUILT
