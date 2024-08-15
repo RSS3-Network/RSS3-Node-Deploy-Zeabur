@@ -16,10 +16,6 @@ spec:
           type: STRING
           name: What is your operator signature?
           description: Used for the operator signature for your node.
-        - key: ACCESS_TOKEN
-          type: STRING
-          name: What is your access token?
-          description: Used for the access token for your node api.
         - key: WEB_URL
           type: DOMAIN
           name: What is your domain for the node?
@@ -167,7 +163,7 @@ spec:
                 NODE_DISCOVERY_OPERATOR_SIGNATURE:
                     default: ${SIGNATURE}
                 NODE_DISCOVERY_SERVER_ACCESS_TOKEN:
-                    default: ${ACCESS_TOKEN}
+                    default: ${PASSWORD}
                 NODE_DISCOVERY_SERVER_ENDPOINT:
                     default: ${ZEABUR_WEB_URL}
                 NODE_DISCOVERY_SERVER_GLOBAL_INDEXER_ENDPOINT:
@@ -197,7 +193,7 @@ spec:
                 NODE_DISCOVERY_OPERATOR_SIGNATURE:
                     default: ${SIGNATURE}
                 NODE_DISCOVERY_SERVER_ACCESS_TOKEN:
-                    default: ${ACCESS_TOKEN}
+                    default: ${PASSWORD}
                 NODE_DISCOVERY_SERVER_ENDPOINT:
                     default: ${ZEABUR_WEB_URL}
                 NODE_DISCOVERY_SERVER_GLOBAL_INDEXER_ENDPOINT:
