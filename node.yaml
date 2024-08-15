@@ -2,9 +2,9 @@
 apiVersion: zeabur.com/v1
 kind: Template
 metadata:
-    name: RSS3 Node
+    name: RSS3 Node Dev
 spec:
-    description: Deploy a RSS3 Node easily!
+    description: Deploy a RSS3 Node Dev easily!
     coverImage: https://a-us.storyblok.com/f/1018186/2600x1420/59d1051f18/chips.png
     icon: https://avatars.githubusercontent.com/u/152575164?s=48&v=4
     variables:
@@ -42,26 +42,26 @@ spec:
 
         ![Explorer](https://a-us.storyblok.com/f/1018186/2100x1864/8ef489d9c0/explorer.png)
     services:
-        - name: CockroachDB
-          icon: https://image.pseudoyu.com/images/cockroachdb.svg
+        - name: cockroachdb
+          icon: https://coralogix.com/wp-content/uploads/2024/02/CockroachDB-1000X1000.png
           template: PREBUILT
           spec:
             source:
                 image: cockroachdb/cockroach:v23.1.8
+                command:
+                    - ./cockroach
+                    - start-single-node
+                    - --insecure
             ports:
-                - id: database
+                - id: native
                   port: 26257
                   type: TCP
                 - id: http
                   port: 8080
-                  type: TCP
+                  type: HTTP
             volumes:
                 - id: data
                   dir: /cockroach/cockroach-data
-            command:
-                - start-single-node
-                - --cluster-name=node
-                - --insecure
             env:
                 COCKROACHDB_CONNECTION_STRING:
                     default: postgres://${COCKROACHDB_USER}@${COCKROACHDB_HOST}:${COCKROACHDB_PORT}/${COCKROACHDB_DB}
@@ -157,6 +157,10 @@ spec:
                     default: https://gi.rss3.dev
                 NODE_DISCOVERY_SERVER_ACCESS_TOKEN:
                     default: ${ACCESS_TOKEN}
+                NODE_OBSERVABILITY_OPENTELEMETRY_METRICS_ENABLE:
+                    default: false
+                NODE_OBSERVABILITY_OPENTELEMETRY_TRACES_ENABLE:
+                    default: false
         - name: RSS3-Node-Core
           icon: https://explorer.rss3.io/rss3.svg
           template: PREBUILT
@@ -171,6 +175,8 @@ spec:
                     default: ${COCKROACHDB_CONNECTION_STRING}
                 NODE_REDIS_ENDPOINT:
                     default: ${REDIS_HOST}:${REDIS_PORT}
+                NODE_REDIS_PASSWORD:
+                    default: ${REDIS_PASSWORD}
                 NODE_DISCOVERY_OPERATOR_EVM_ADDRESS:
                     default: ${EVM_ADDRESS}
                 NODE_DISCOVERY_OPERATOR_SIGNATURE:
@@ -181,6 +187,10 @@ spec:
                     default: https://gi.rss3.dev
                 NODE_DISCOVERY_SERVER_ACCESS_TOKEN:
                     default: ${ACCESS_TOKEN}
+                NODE_OBSERVABILITY_OPENTELEMETRY_METRICS_ENABLE:
+                    default: false
+                NODE_OBSERVABILITY_OPENTELEMETRY_TRACES_ENABLE:
+                    default: false
             ports:
               - id: web
                 port: 80
@@ -195,15 +205,13 @@ spec:
                 command:
                     - ./node
                     - --module=monitor
-            ports:
-                - id: web
-                  port: 80
-                  type: HTTP
             env:
                 NODE_DATABASE_URI:
                     default: ${COCKROACHDB_CONNECTION_STRING}
                 NODE_REDIS_ENDPOINT:
                     default: ${REDIS_HOST}:${REDIS_PORT}
+                NODE_REDIS_PASSWORD:
+                    default: ${REDIS_PASSWORD}
         - name: RSS3-Node-VSL-CORE
           icon: https://explorer.rss3.io/rss3.svg
           template: PREBUILT
@@ -213,12 +221,14 @@ spec:
                 command:
                     - ./node
                     - --worker.id=vsl-core
-            ports:
-                - id: web
-                  port: 80
-                  type: HTTP
             env:
                 NODE_DATABASE_URI:
                     default: ${COCKROACHDB_CONNECTION_STRING}
                 NODE_REDIS_ENDPOINT:
                     default: ${REDIS_HOST}:${REDIS_PORT}
+                NODE_REDIS_PASSWORD:
+                    default: ${REDIS_PASSWORD}
+                NODE_OBSERVABILITY_OPENTELEMETRY_METRICS_ENABLE:
+                    default: false
+                NODE_OBSERVABILITY_OPENTELEMETRY_TRACES_ENABLE:
+                    default: false
