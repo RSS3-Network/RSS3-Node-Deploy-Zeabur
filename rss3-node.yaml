@@ -20,6 +20,10 @@ spec:
           type: DOMAIN
           name: What is your domain for the node?
           description: Used for expose the node to the public web.
+        - key: GI_ENDPOINT
+          type: STRING
+          name: What is your global indexer endpoint?
+          description: Used for the global indexer endpoint for your node.
     tags:
         - web3
     readme: |
@@ -58,6 +62,25 @@ spec:
             volumes:
                 - id: data
                   dir: /cockroach/cockroach-data
+            instructions:
+                - type: TEXT
+                  title: Command to connect to your CockroachDB
+                  content: cockroach sql --insecure -h ${COCKROACHDB_HOST} -p ${COCKROACHDB_PORT}
+                - type: TEXT
+                  title: CockroachDB Connection String
+                  content: postgres://${COCKROACHDB_USER}@${COCKROACHDB_HOST}:${COCKROACHDB_PORT}/${COCKROACHDB_DB}
+                - type: TEXT
+                  title: CockroachDB Host
+                  content: ${COCKROACHDB_HOST}
+                - type: TEXT
+                  title: CockroachDB Port
+                  content: ${COCKROACHDB_PORT}
+                - type: TEXT
+                  title: CockroachDB Database
+                  content: ${COCKROACHDB_DB}
+                - type: TEXT
+                  title: CockroachDB User
+                  content: ${COCKROACHDB_USER}
             env:
                 COCKROACHDB_CONNECTION_STRING:
                     default: postgres://${COCKROACHDB_USER}@${COCKROACHDB_HOST}:${COCKROACHDB_PORT}/${COCKROACHDB_DB}
@@ -133,6 +156,43 @@ spec:
                     default: ${REDIS_CONNECTION_STRING}
                     expose: true
                     readonly: true
+        - name: RSS3-Node-Core
+          icon: https://explorer.rss3.io/rss3.svg
+          template: PREBUILT
+          spec:
+            source:
+                image: ghcr.io/rss3-network/node:v0.5.33
+                command:
+                    - ./node
+                    - --module=core
+            ports:
+                - id: web
+                  port: 80
+                  type: HTTP
+            env:
+                PUBLIC_DOMAIN:
+                    default: ${ZEABUR_WEB_URL}
+                    expose: true
+                    readonly: true
+                NODE_DATABASE_URI:
+                    default: ${COCKROACHDB_CONNECTION_STRING}
+                NODE_DISCOVERY_OPERATOR_EVM_ADDRESS:
+                    default: ${EVM_ADDRESS}
+                NODE_DISCOVERY_OPERATOR_SIGNATURE:
+                    default: ${SIGNATURE}
+                NODE_DISCOVERY_SERVER_ACCESS_TOKEN:
+                    default: ${BROADCASTER_PASSWORD}
+                NODE_DISCOVERY_SERVER_GLOBAL_INDEXER_ENDPOINT:
+                    default: ${GI_ENDPOINT}
+                NODE_OBSERVABILITY_OPENTELEMETRY_METRICS_ENABLE:
+                    default: "false"
+                NODE_OBSERVABILITY_OPENTELEMETRY_TRACES_ENABLE:
+                    default: "false"
+                NODE_REDIS_ENDPOINT:
+                    default: ${REDIS_HOST}:${REDIS_PORT}
+                NODE_REDIS_PASSWORD:
+                    default: ${REDIS_PASSWORD}
+          domainKey: WEB_URL
         - name: RSS3-Node-Broadcaster
           icon: https://explorer.rss3.io/rss3.svg
           template: PREBUILT
@@ -153,46 +213,13 @@ spec:
                 NODE_DISCOVERY_SERVER_ACCESS_TOKEN:
                     default: ${BROADCASTER_PASSWORD}
                 NODE_DISCOVERY_SERVER_ENDPOINT:
-                    default: https://${WEB_URL}.zeabur.app
+                    default: ${PUBLIC_DOMAIN}
                 NODE_DISCOVERY_SERVER_GLOBAL_INDEXER_ENDPOINT:
-                    default: https://gi.rss3.dev
+                    default: ${GI_ENDPOINT}
                 NODE_OBSERVABILITY_OPENTELEMETRY_METRICS_ENABLE:
                     default: "false"
                 NODE_OBSERVABILITY_OPENTELEMETRY_TRACES_ENABLE:
                     default: "false"
-        - name: RSS3-Node-Core
-          icon: https://explorer.rss3.io/rss3.svg
-          template: PREBUILT
-          spec:
-            source:
-                image: ghcr.io/rss3-network/node:v0.5.33
-                command:
-                    - ./node
-                    - --module=core
-            ports:
-                - id: web
-                  port: 80
-                  type: HTTP
-            env:
-                NODE_DATABASE_URI:
-                    default: ${COCKROACHDB_CONNECTION_STRING}
-                NODE_DISCOVERY_OPERATOR_EVM_ADDRESS:
-                    default: ${EVM_ADDRESS}
-                NODE_DISCOVERY_OPERATOR_SIGNATURE:
-                    default: ${SIGNATURE}
-                NODE_DISCOVERY_SERVER_ACCESS_TOKEN:
-                    default: ${BROADCASTER_PASSWORD}
-                NODE_DISCOVERY_SERVER_GLOBAL_INDEXER_ENDPOINT:
-                    default: https://gi.rss3.dev
-                NODE_OBSERVABILITY_OPENTELEMETRY_METRICS_ENABLE:
-                    default: "false"
-                NODE_OBSERVABILITY_OPENTELEMETRY_TRACES_ENABLE:
-                    default: "false"
-                NODE_REDIS_ENDPOINT:
-                    default: ${REDIS_HOST}:${REDIS_PORT}
-                NODE_REDIS_PASSWORD:
-                    default: ${REDIS_PASSWORD}
-          domainKey: WEB_URL
         - name: RSS3-Node-Monitor
           icon: https://explorer.rss3.io/rss3.svg
           template: PREBUILT
