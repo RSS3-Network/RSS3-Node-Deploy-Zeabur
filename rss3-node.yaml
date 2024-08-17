@@ -167,7 +167,7 @@ spec:
           template: PREBUILT
           spec:
             source:
-                image: ghcr.io/rss3-network/node:v0.5.33
+                image: ghcr.io/rss3-network/node:v0.5.34
                 command:
                     - ./node
                     - --module=core
@@ -204,7 +204,7 @@ spec:
           template: PREBUILT
           spec:
             source:
-                image: ghcr.io/rss3-network/node:v0.5.33
+                image: ghcr.io/rss3-network/node:v0.5.34
                 command:
                     - ./node
                     - --module=broadcaster
@@ -231,7 +231,7 @@ spec:
           template: PREBUILT
           spec:
             source:
-                image: ghcr.io/rss3-network/node:v0.5.33
+                image: ghcr.io/rss3-network/node:v0.5.34
                 command:
                     - ./node
                     - --module=monitor
@@ -247,7 +247,7 @@ spec:
           template: PREBUILT
           spec:
             source:
-                image: ghcr.io/rss3-network/node:v0.5.33
+                image: ghcr.io/rss3-network/node:v0.5.34
                 command:
                     - ./node
                     - --worker.id=vsl-core
