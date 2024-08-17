@@ -1,19 +1,24 @@
 # RSS3 Node
 
-## Description
+## Prerequisites
 
-The RSS3 Node, an RSS3 Data Sublayer (DSL) component, is responsible for indexing, transforming, storing, and ultimately serving the Open Information to the end users.
+Before deploying, you need to create a node on the explorer: [RSS3 Explorer](https://explorer.rss3.io/nodes).
 
-[![Deploy on Zeabur](https://zeabur.com/button.svg)](https://zeabur.com/templates/JSLSMJ?referralCode=pseudoyu)
+Additionally, ensure that your Zeabur account is upgraded to at least the Developer Plan ($5/month).
 
-## Register Your Node
+## Deployment
 
-![register](https://a-us.storyblok.com/f/1018186/2001x1437/25f760d323/alphanodes.png)
+You only need to fill in two fields in the RSS3-Node service:
 
-You can check [this doc](https://docs.rss3.io/guide/for-node-operators/node-deployment-guide) from RSS3 team for a more detailed guide for registering a node.
+- **Operator EVM Address**: Your wallet address (which is also your node address).
+- **Operator Signature**: The challenge signature obtained here: https://explorer.rss3.io/nodes/YOUR_WALLET_ADDRESS. (Click the "Signature" button to complete the challenge and copy your signature to paste here.)
+- **Custom Domain**: The domain name you want to use for your node.
+- **Global Indexer Endpoint**: The global indexer endpoint for your node. (You can use the default value.)
 
-## The Mainnet Explorer
+After the service starts, it will join the RSS3 Network as a lightweight RSS3 Node.
 
-One of the best ways to interact with the Mainnet is through the RSS3 Explorer.
+## Contact
 
-![Explorer](https://a-us.storyblok.com/f/1018186/2100x1864/8ef489d9c0/explorer.png)
+If you have any questions, feel free to contact me: [pseudoyu@rss3.io](mailto:pseudoyu@rss3.io).
+
+Join the RSS3 Discord: [RSS3 Discord](https://link.rss3.io/discord)
