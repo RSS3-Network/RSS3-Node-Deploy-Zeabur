@@ -162,12 +162,27 @@ spec:
                     default: ${REDIS_CONNECTION_STRING}
                     expose: true
                     readonly: true
+        - name: RSSHub
+          icon: https://docs.rsshub.app/logo.png
+          template: PREBUILT
+          spec:
+            source:
+                image: diygod/rsshub
+            ports:
+                - id: web
+                  port: 1200
+                  type: HTTP
+            env:
+                CACHE_TYPE:
+                    default: redis
+                REDIS_URL:
+                    default: ${REDIS_URI}
         - name: RSS3-Node-Core
           icon: https://explorer.rss3.io/rss3.svg
           template: PREBUILT
           spec:
             source:
-                image: ghcr.io/rss3-network/node:v0.5.34
+                image: ghcr.io/rss3-network/node:v0.5.37
                 command:
                     - ./node
                     - --module=core
@@ -187,7 +202,10 @@ spec:
                 NODE_DISCOVERY_OPERATOR_SIGNATURE:
                     default: ${SIGNATURE}
                 NODE_DISCOVERY_SERVER_ACCESS_TOKEN:
-                    default: ${BROADCASTER_PASSWORD}
+                    default: ${PASSWORD}
+                CORE_PASSWORD:
+                    default: ${PASSWORD}
+                    expose: true
                 NODE_DISCOVERY_SERVER_GLOBAL_INDEXER_ENDPOINT:
                     default: ${GI_ENDPOINT}
                 NODE_OBSERVABILITY_OPENTELEMETRY_METRICS_ENABLE:
@@ -198,26 +216,25 @@ spec:
                     default: ${REDIS_HOST}:${REDIS_PORT}
                 NODE_REDIS_PASSWORD:
                     default: ${REDIS_PASSWORD}
+                NODE_COMPONENT_RSS_ENDPOINT:
+                    default: "http://rsshub.zeabur.internal:1200"
           domainKey: WEB_URL
         - name: RSS3-Node-Broadcaster
           icon: https://explorer.rss3.io/rss3.svg
           template: PREBUILT
           spec:
             source:
-                image: ghcr.io/rss3-network/node:v0.5.34
+                image: ghcr.io/rss3-network/node:v0.5.37
                 command:
                     - ./node
                     - --module=broadcaster
             env:
-                BROADCASTER_PASSWORD:
-                    default: ${PASSWORD}
-                    expose: true
                 NODE_DISCOVERY_OPERATOR_EVM_ADDRESS:
                     default: ${EVM_ADDRESS}
                 NODE_DISCOVERY_OPERATOR_SIGNATURE:
                     default: ${SIGNATURE}
                 NODE_DISCOVERY_SERVER_ACCESS_TOKEN:
-                    default: ${BROADCASTER_PASSWORD}
+                    default: ${CORE_PASSWORD}
                 NODE_DISCOVERY_SERVER_ENDPOINT:
                     default: ${PUBLIC_DOMAIN}
                 NODE_DISCOVERY_SERVER_GLOBAL_INDEXER_ENDPOINT:
@@ -231,7 +248,7 @@ spec:
           template: PREBUILT
           spec:
             source:
-                image: ghcr.io/rss3-network/node:v0.5.34
+                image: ghcr.io/rss3-network/node:v0.5.37
                 command:
                     - ./node
                     - --module=monitor
@@ -247,7 +264,7 @@ spec:
           template: PREBUILT
           spec:
             source:
-                image: ghcr.io/rss3-network/node:v0.5.34
+                image: ghcr.io/rss3-network/node:v0.5.37
                 command:
                     - ./node
                     - --worker.id=vsl-core
