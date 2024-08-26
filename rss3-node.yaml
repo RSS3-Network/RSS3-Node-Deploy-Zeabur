@@ -48,66 +48,102 @@ spec:
         If you have any questions, feel free to contact me: [pseudoyu@rss3.io](mailto:pseudoyu@rss3.io).
 
     services:
-        - name: cockroachdb
-          icon: https://coralogix.com/wp-content/uploads/2024/02/CockroachDB-1000X1000.png
+        - name: PostgreSQL
+          icon: https://raw.githubusercontent.com/zeabur/service-icons/main/marketplace/postgresql.svg
           template: PREBUILT
           spec:
             source:
-                image: cockroachdb/cockroach:v23.1.8
+                image: postgres:16
                 command:
-                    - ./cockroach
-                    - start-single-node
-                    - --insecure
+                    - docker-entrypoint.sh
+                    - -c
+                    - config_file=/etc/postgresql/postgresql.conf
             ports:
-                - id: native
-                  port: 26257
+                - id: database
+                  port: 5432
                   type: TCP
-                - id: http
-                  port: 8080
-                  type: HTTP
             volumes:
                 - id: data
-                  dir: /cockroach/cockroach-data
+                  dir: /var/lib/postgresql/data
             instructions:
                 - type: TEXT
-                  title: Command to connect to your CockroachDB
-                  content: cockroach sql --insecure -h ${COCKROACHDB_HOST} -p ${COCKROACHDB_PORT}
+                  title: Connection String
+                  content: postgresql://${POSTGRES_USERNAME}:${POSTGRES_PASSWORD}@${PORT_FORWARDED_HOSTNAME}:${DATABASE_PORT_FORWARDED_PORT}/${POSTGRES_DATABASE}
                 - type: TEXT
-                  title: CockroachDB Connection String
-                  content: postgres://${COCKROACHDB_USER}@${COCKROACHDB_HOST}:${COCKROACHDB_PORT}/${COCKROACHDB_DB}
+                  title: PostgreSQL Connect Command
+                  content: psql "postgresql://${POSTGRES_USERNAME}:${POSTGRES_PASSWORD}@${PORT_FORWARDED_HOSTNAME}:${DATABASE_PORT_FORWARDED_PORT}/${POSTGRES_DATABASE}"
                 - type: TEXT
-                  title: CockroachDB Host
-                  content: ${COCKROACHDB_HOST}
+                  title: PostgreSQL username
+                  content: ${POSTGRES_USERNAME}
+                  category: Credentials
+                - type: PASSWORD
+                  title: PostgresSQL password
+                  content: ${POSTGRES_PASSWORD}
+                  category: Credentials
                 - type: TEXT
-                  title: CockroachDB Port
-                  content: ${COCKROACHDB_PORT}
+                  title: PostgresSQL database
+                  content: ${POSTGRES_DATABASE}
+                  category: Credentials
                 - type: TEXT
-                  title: CockroachDB Database
-                  content: ${COCKROACHDB_DB}
+                  title: PostgreSQL host
+                  content: ${PORT_FORWARDED_HOSTNAME}
+                  category: Hostname & Port
                 - type: TEXT
-                  title: CockroachDB User
-                  content: ${COCKROACHDB_USER}
+                  title: PostgreSQL port
+                  content: ${DATABASE_PORT_FORWARDED_PORT}
+                  category: Hostname & Port
             env:
-                COCKROACHDB_CONNECTION_STRING:
-                    default: postgres://${COCKROACHDB_USER}@${COCKROACHDB_HOST}:${COCKROACHDB_PORT}/${COCKROACHDB_DB}
+                PGDATA:
+                    default: /var/lib/postgresql/data/pgdata
+                POSTGRES_CONNECTION_STRING:
+                    default: postgresql://${POSTGRES_USERNAME}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DATABASE}
                     expose: true
                     readonly: true
-                COCKROACHDB_DB:
-                    default: defaultdb
+                POSTGRES_DATABASE:
+                    default: ${POSTGRES_DB}
                     expose: true
                     readonly: true
-                COCKROACHDB_HOST:
+                POSTGRES_DB:
+                    default: zeabur
+                POSTGRES_HOST:
                     default: ${CONTAINER_HOSTNAME}
                     expose: true
                     readonly: true
-                COCKROACHDB_PORT:
-                    default: "26257"
+                POSTGRES_PASSWORD:
+                    default: ${PASSWORD}
+                    expose: true
+                POSTGRES_PORT:
+                    default: ${DATABASE_PORT}
                     expose: true
                     readonly: true
-                COCKROACHDB_USER:
+                POSTGRES_URI:
+                    default: ${POSTGRES_CONNECTION_STRING}
+                    expose: true
+                    readonly: true
+                POSTGRES_USER:
                     default: root
+                POSTGRES_USERNAME:
+                    default: ${POSTGRES_USER}
                     expose: true
                     readonly: true
+            configs:
+                - path: /etc/postgresql/postgresql.conf
+                  template: |
+                    # https://github.com/postgres/postgres/blob/master/src/backend/utils/misc/postgresql.conf.sample
+                    listen_addresses = '*'
+                    max_connections = 100
+                    shared_buffers = 128MB
+                    dynamic_shared_memory_type = posix
+                    max_wal_size = 1GB
+                    min_wal_size = 80MB
+                    log_timezone = 'Etc/UTC'
+                    datestyle = 'iso, mdy'
+                    timezone = 'Etc/UTC'
+                    lc_messages = 'en_US.utf8'
+                    lc_monetary = 'en_US.utf8'
+                    lc_numeric = 'en_US.utf8'
+                    lc_time = 'en_US.utf8'
+                    default_text_search_config = 'pg_catalog.english'
         - name: Redis
           icon: https://raw.githubusercontent.com/zeabur/service-icons/main/marketplace/redis.svg
           template: PREBUILT
@@ -182,7 +218,7 @@ spec:
           template: PREBUILT
           spec:
             source:
-                image: ghcr.io/rss3-network/node:v0.5.37
+                image: ghcr.io/rss3-network/node:v0.5.43
                 command:
                     - ./node
                     - --module=core
@@ -196,7 +232,7 @@ spec:
                     expose: true
                     readonly: true
                 NODE_DATABASE_URI:
-                    default: ${COCKROACHDB_CONNECTION_STRING}
+                    default: ${POSTGRES_CONNECTION_STRING}
                 NODE_DISCOVERY_OPERATOR_EVM_ADDRESS:
                     default: ${EVM_ADDRESS}
                 NODE_DISCOVERY_OPERATOR_SIGNATURE:
@@ -224,7 +260,7 @@ spec:
           template: PREBUILT
           spec:
             source:
-                image: ghcr.io/rss3-network/node:v0.5.37
+                image: ghcr.io/rss3-network/node:v0.5.43
                 command:
                     - ./node
                     - --module=broadcaster
@@ -248,13 +284,13 @@ spec:
           template: PREBUILT
           spec:
             source:
-                image: ghcr.io/rss3-network/node:v0.5.37
+                image: ghcr.io/rss3-network/node:v0.5.43
                 command:
                     - ./node
                     - --module=monitor
             env:
                 NODE_DATABASE_URI:
-                    default: ${COCKROACHDB_CONNECTION_STRING}
+                    default: ${POSTGRES_CONNECTION_STRING}
                 NODE_REDIS_ENDPOINT:
                     default: ${REDIS_HOST}:${REDIS_PORT}
                 NODE_REDIS_PASSWORD:
@@ -264,13 +300,13 @@ spec:
           template: PREBUILT
           spec:
             source:
-                image: ghcr.io/rss3-network/node:v0.5.37
+                image: ghcr.io/rss3-network/node:v0.5.43
                 command:
                     - ./node
                     - --worker.id=vsl-core
             env:
                 NODE_DATABASE_URI:
-                    default: ${COCKROACHDB_CONNECTION_STRING}
+                    default: ${POSTGRES_CONNECTION_STRING}
                 NODE_OBSERVABILITY_OPENTELEMETRY_METRICS_ENABLE:
                     default: "false"
                 NODE_OBSERVABILITY_OPENTELEMETRY_TRACES_ENABLE:
