@@ -279,6 +279,8 @@ spec:
                     default: "false"
                 NODE_OBSERVABILITY_OPENTELEMETRY_TRACES_ENABLE:
                     default: "false"
+                NODE_COMPONENT_RSS_ENDPOINT:
+                    default: "http://rsshub.zeabur.internal:1200"
         - name: RSS3-Node-Monitor
           icon: https://explorer.rss3.io/rss3.svg
           template: PREBUILT
