@@ -307,6 +307,8 @@ spec:
                     default: ${REDIS_HOST}:${REDIS_PORT}
                 NODE_REDIS_PASSWORD:
                     default: ${REDIS_PASSWORD}
+                NODE_COMPONENT_RSS_ENDPOINT:
+                    default: "http://rsshub.zeabur.internal:1200"
         - name: RSS3-Node-VSL-Core
           icon: https://explorer.rss3.io/rss3.svg
           template: PREBUILT
