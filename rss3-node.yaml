@@ -201,6 +201,8 @@ spec:
         - name: RSSHub
           icon: https://docs.rsshub.app/logo.png
           template: PREBUILT
+          dependencies:
+            - Redis
           spec:
             source:
                 image: diygod/rsshub
@@ -216,9 +218,12 @@ spec:
         - name: RSS3-Node-Core
           icon: https://explorer.rss3.io/rss3.svg
           template: PREBUILT
+          dependencies:
+            - PostgreSQL
+            - Redis
           spec:
             source:
-                image: ghcr.io/rss3-network/node:v1.0.2
+                image: ghcr.io/rss3-network/node:v1.1.1
                 command:
                     - ./node
                     - --module=core
@@ -258,9 +263,11 @@ spec:
         - name: RSS3-Node-Broadcaster
           icon: https://explorer.rss3.io/rss3.svg
           template: PREBUILT
+          dependencies:
+            - RSS3-Node-Core
           spec:
             source:
-                image: ghcr.io/rss3-network/node:v1.0.2
+                image: ghcr.io/rss3-network/node:v1.1.1
                 command:
                     - ./node
                     - --module=broadcaster
@@ -284,9 +291,12 @@ spec:
         - name: RSS3-Node-Monitor
           icon: https://explorer.rss3.io/rss3.svg
           template: PREBUILT
+          dependencies:
+            - PostgreSQL
+            - Redis
           spec:
             source:
-                image: ghcr.io/rss3-network/node:v1.0.2
+                image: ghcr.io/rss3-network/node:v1.1.1
                 command:
                     - ./node
                     - --module=monitor
@@ -300,9 +310,12 @@ spec:
         - name: RSS3-Node-VSL-Core
           icon: https://explorer.rss3.io/rss3.svg
           template: PREBUILT
+          dependencies:
+            - PostgreSQL
+            - Redis
           spec:
             source:
-                image: ghcr.io/rss3-network/node:v1.0.2
+                image: ghcr.io/rss3-network/node:v1.1.1
                 command:
                     - ./node
                     - --worker.id=vsl-core
