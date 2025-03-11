@@ -24,6 +24,38 @@ spec:
       type: STRING
       name: What is your global indexer endpoint?
       description: Used for the global indexer endpoint for your node.
+    - key: OPENAI_API_KEY
+      type: STRING
+      name: What is your OpenAI API key?
+      description: Used for AI capabilities in the AgentData service (optional).
+    - key: OLLAMA_HOST
+      type: STRING
+      name: What is your Ollama host?
+      description: Used for local model hosting in the AgentData service (optional).
+    - key: TWITTER_BEARER_TOKEN
+      type: STRING
+      name: What is your Twitter bearer token?
+      description: Used for Twitter integration in the AgentData service (optional).
+    - key: TWITTER_API_KEY
+      type: STRING
+      name: What is your Twitter API key?
+      description: Used for Twitter integration in the AgentData service (optional).
+    - key: TWITTER_API_SECRET
+      type: STRING
+      name: What is your Twitter API secret?
+      description: Used for Twitter integration in the AgentData service (optional).
+    - key: TWITTER_ACCESS_TOKEN
+      type: STRING
+      name: What is your Twitter access token?
+      description: Used for Twitter integration in the AgentData service (optional).
+    - key: TWITTER_ACCESS_TOKEN_SECRET
+      type: STRING
+      name: What is your Twitter access token secret?
+      description: Used for Twitter integration in the AgentData service (optional).
+    - key: KAITO_API_TOKEN
+      type: STRING
+      name: What is your Kaito API token?
+      description: Used for additional integration in the AgentData service (optional).
   tags:
     - web3
   readme: |
@@ -42,6 +74,20 @@ spec:
     - **Global Indexer Endpoint**: The global indexer endpoint for your node. (You can use the default value.)
 
     After the service starts, it will join the RSS3 Network as a lightweight RSS3 Node.
+
+    ## AI Agent Integration
+
+    The template now includes the AgentData service, which provides AI capabilities to your RSS3 Node:
+
+    - The AgentData service is automatically connected to your node components
+    - All AI-related API keys are **optional**
+    - If you want to enable AI capabilities, you can provide any of the following:
+      - **OpenAI API Key**: For accessing OpenAI models
+      - **Ollama Host**: For local model hosting
+      - **Twitter API Credentials**: For Twitter data integration
+      - **Kaito API Token**: For additional data integrations
+
+    AI capabilities enhance your node with intelligent data processing, content generation, and advanced analytics.
 
     ## Contact
 
@@ -198,6 +244,91 @@ spec:
             default: ${REDIS_CONNECTION_STRING}
             expose: true
             readonly: true
+    - name: OpenAgentDB
+      icon: https://raw.githubusercontent.com/zeabur/service-icons/main/marketplace/postgresql.svg
+      template: PREBUILT
+      spec:
+        source:
+          image: postgres:16
+          command:
+            - docker-entrypoint.sh
+            - -c
+            - config_file=/etc/postgresql/postgresql.conf
+        ports:
+          - id: database
+            port: 5432
+            type: TCP
+        volumes:
+          - id: data
+            dir: /var/lib/postgresql/data
+        instructions:
+          - type: TEXT
+            title: Connection String
+            content: postgresql://${POSTGRES_USERNAME}:${POSTGRES_PASSWORD}@${PORT_FORWARDED_HOSTNAME}:${DATABASE_PORT_FORWARDED_PORT}/${POSTGRES_DATABASE}
+          - type: TEXT
+            title: PostgreSQL Connect Command
+            content: psql "postgresql://${POSTGRES_USERNAME}:${POSTGRES_PASSWORD}@${PORT_FORWARDED_HOSTNAME}:${DATABASE_PORT_FORWARDED_PORT}/${POSTGRES_DATABASE}"
+          - type: TEXT
+            title: PostgreSQL username
+            content: ${POSTGRES_USERNAME}
+            category: Credentials
+          - type: PASSWORD
+            title: PostgresSQL password
+            content: ${POSTGRES_PASSWORD}
+            category: Credentials
+          - type: TEXT
+            title: PostgresSQL database
+            content: ${POSTGRES_DATABASE}
+            category: Credentials
+          - type: TEXT
+            title: PostgreSQL host
+            content: ${PORT_FORWARDED_HOSTNAME}
+            category: Hostname & Port
+          - type: TEXT
+            title: PostgreSQL port
+            content: ${DATABASE_PORT_FORWARDED_PORT}
+            category: Hostname & Port
+        env:
+          PGDATA:
+            default: /var/lib/postgresql/data/pgdata
+          AGENT_DATA_POSTGRES_CONNECTION_STRING:
+            default: postgresql://${POSTGRES_USERNAME}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DATABASE}
+            expose: true
+            readonly: true
+          POSTGRES_DATABASE:
+            default: ${POSTGRES_DB}
+          POSTGRES_DB:
+            default: agent_data
+          POSTGRES_HOST:
+            default: ${CONTAINER_HOSTNAME}
+          POSTGRES_PASSWORD:
+            default: ${PASSWORD}
+          POSTGRES_PORT:
+            default: ${DATABASE_PORT}
+          POSTGRES_URI:
+            default: ${POSTGRES_CONNECTION_STRING}
+          POSTGRES_USER:
+            default: root
+          POSTGRES_USERNAME:
+            default: ${POSTGRES_USER}
+        configs:
+          - path: /etc/postgresql/postgresql.conf
+            template: |
+              # https://github.com/postgres/postgres/blob/master/src/backend/utils/misc/postgresql.conf.sample
+              listen_addresses = '*'
+              max_connections = 100
+              shared_buffers = 128MB
+              dynamic_shared_memory_type = posix
+              max_wal_size = 1GB
+              min_wal_size = 80MB
+              log_timezone = 'Etc/UTC'
+              datestyle = 'iso, mdy'
+              timezone = 'Etc/UTC'
+              lc_messages = 'en_US.utf8'
+              lc_monetary = 'en_US.utf8'
+              lc_numeric = 'en_US.utf8'
+              lc_time = 'en_US.utf8'
+              default_text_search_config = 'pg_catalog.english'
     - name: RSSHub
       icon: https://docs.rsshub.app/logo.png
       template: PREBUILT
@@ -215,12 +346,47 @@ spec:
             default: redis
           REDIS_URL:
             default: ${REDIS_URI}
+    - name: AgentData
+      icon: https://avatars.githubusercontent.com/u/184013737?s=200&v=4
+      template: PREBUILT
+      dependencies:
+        - OpenAgentDB
+      spec:
+        source:
+          image: ghcr.io/rss3-network/agentdata
+        ports:
+          - id: web
+            port: 8887
+            type: HTTP
+        volumes:
+          - id: data
+            dir: /agent_data
+        env:
+          DB_CONNECTION:
+            default: ${AGENT_DATA_POSTGRES_CONNECTION_STRING}
+          OPENAI_API_KEY:
+            default: ${OPENAI_API_KEY}
+          OLLAMA_HOST:
+            default: ${OLLAMA_HOST}
+          TWITTER_BEARER_TOKEN:
+            default: ${TWITTER_BEARER_TOKEN}
+          TWITTER_API_KEY:
+            default: ${TWITTER_API_KEY}
+          TWITTER_API_SECRET:
+            default: ${TWITTER_API_SECRET}
+          TWITTER_ACCESS_TOKEN:
+            default: ${TWITTER_ACCESS_TOKEN}
+          TWITTER_ACCESS_TOKEN_SECRET:
+            default: ${TWITTER_ACCESS_TOKEN_SECRET}
+          KAITO_API_TOKEN:
+            default: ${KAITO_API_TOKEN}
     - name: RSS3-Node-Core
       icon: https://explorer.rss3.io/rss3.svg
       template: PREBUILT
       dependencies:
         - PostgreSQL
         - Redis
+        - AgentData
       spec:
         source:
           image: ghcr.io/rss3-network/node:v1.2.0
@@ -259,12 +425,15 @@ spec:
             default: ${REDIS_PASSWORD}
           NODE_COMPONENT_RSS_ENDPOINT:
             default: "http://rsshub.zeabur.internal:1200"
+          NODE_COMPONENT_AGENT_ENDPOINT:
+            default: "http://agentdata.zeabur.internal:8887"
       domainKey: WEB_URL
     - name: RSS3-Node-Broadcaster
       icon: https://explorer.rss3.io/rss3.svg
       template: PREBUILT
       dependencies:
         - RSS3-Node-Core
+        - AgentData
       spec:
         source:
           image: ghcr.io/rss3-network/node:v1.2.0
@@ -288,12 +457,15 @@ spec:
             default: "false"
           NODE_COMPONENT_RSS_ENDPOINT:
             default: "http://rsshub.zeabur.internal:1200"
+          NODE_COMPONENT_AGENT_ENDPOINT:
+            default: "http://agentdata.zeabur.internal:8887"
     - name: RSS3-Node-Monitor
       icon: https://explorer.rss3.io/rss3.svg
       template: PREBUILT
       dependencies:
         - PostgreSQL
         - Redis
+        - AgentData
       spec:
         source:
           image: ghcr.io/rss3-network/node:v1.2.0
@@ -309,6 +481,8 @@ spec:
             default: ${REDIS_PASSWORD}
           NODE_COMPONENT_RSS_ENDPOINT:
             default: "http://rsshub.zeabur.internal:1200"
+          NODE_COMPONENT_AGENT_ENDPOINT:
+            default: "http://agentdata.zeabur.internal:8887"
     - name: RSS3-Node-VSL-Core
       icon: https://explorer.rss3.io/rss3.svg
       template: PREBUILT
