@@ -2,333 +2,333 @@
 apiVersion: zeabur.com/v1
 kind: Template
 metadata:
-    name: RSS3 Node
+  name: RSS3 Node
 spec:
-    description: A lightweight service that joins the RSS3 Network as a node.
-    coverImage: https://a-us.storyblok.com/f/1018186/2600x1420/59d1051f18/chips.png
-    icon: https://avatars.githubusercontent.com/u/152575164?s=48&v=4
-    variables:
-        - key: EVM_ADDRESS
-          type: STRING
-          name: What is your operator evm address?
-          description: Used for the operator evm address for your node.
-        - key: SIGNATURE
-          type: STRING
-          name: What is your operator signature?
-          description: Used for the operator signature for your node.
-        - key: WEB_URL
-          type: DOMAIN
-          name: What is your domain for the node?
-          description: Used for expose the node to the public web.
-        - key: GI_ENDPOINT
-          type: STRING
-          name: What is your global indexer endpoint?
-          description: Used for the global indexer endpoint for your node.
-    tags:
-        - web3
-    readme: |
-        ## Prerequisites
+  description: A lightweight service that joins the RSS3 Network as a node.
+  coverImage: https://a-us.storyblok.com/f/1018186/2600x1420/59d1051f18/chips.png
+  icon: https://avatars.githubusercontent.com/u/152575164?s=48&v=4
+  variables:
+    - key: EVM_ADDRESS
+      type: STRING
+      name: What is your operator evm address?
+      description: Used for the operator evm address for your node.
+    - key: SIGNATURE
+      type: STRING
+      name: What is your operator signature?
+      description: Used for the operator signature for your node.
+    - key: WEB_URL
+      type: DOMAIN
+      name: What is your domain for the node?
+      description: Used for expose the node to the public web.
+    - key: GI_ENDPOINT
+      type: STRING
+      name: What is your global indexer endpoint?
+      description: Used for the global indexer endpoint for your node.
+  tags:
+    - web3
+  readme: |
+    ## Prerequisites
 
-        Before deploying, you need to create a node on the explorer: [RSS3 Explorer](https://explorer.rss3.io/nodes).
+    Before deploying, you need to create a node on the explorer: [RSS3 Explorer](https://explorer.rss3.io/nodes).
 
-        Additionally, ensure that your Zeabur account is upgraded to at least the Developer Plan ($5/month).
+    Additionally, ensure that your Zeabur account is upgraded to at least the Developer Plan ($5/month).
 
-        ## Deployment
+    ## Deployment
 
-        You only need to fill in two fields in the RSS3-Node service:
-        - **Operator EVM Address**: Your wallet address (which is also your node address).
-        - **Operator Signature**: The challenge signature obtained here: https://explorer.rss3.io/nodes/YOUR_WALLET_ADDRESS. (Click the "Signature" button to complete the challenge and copy your signature to paste here.)
-        - **Custom Domain**: The domain name you want to use for your node.
-        - **Global Indexer Endpoint**: The global indexer endpoint for your node. (You can use the default value.)
+    You only need to fill in two fields in the RSS3-Node service:
+    - **Operator EVM Address**: Your wallet address (which is also your node address).
+    - **Operator Signature**: The challenge signature obtained here: https://explorer.rss3.io/nodes/YOUR_WALLET_ADDRESS. (Click the "Signature" button to complete the challenge and copy your signature to paste here.)
+    - **Custom Domain**: The domain name you want to use for your node.
+    - **Global Indexer Endpoint**: The global indexer endpoint for your node. (You can use the default value.)
 
-        After the service starts, it will join the RSS3 Network as a lightweight RSS3 Node.
+    After the service starts, it will join the RSS3 Network as a lightweight RSS3 Node.
 
-        ## Contact
+    ## Contact
 
-        If you have any questions, feel free to contact me: [pseudoyu@rss3.io](mailto:pseudoyu@rss3.io).
+    If you have any questions, feel free to contact me: [pseudoyu@rss3.io](mailto:pseudoyu@rss3.io).
 
-    services:
-        - name: PostgreSQL
-          icon: https://raw.githubusercontent.com/zeabur/service-icons/main/marketplace/postgresql.svg
-          template: PREBUILT
-          spec:
-            source:
-                image: postgres:16
-                command:
-                    - docker-entrypoint.sh
-                    - -c
-                    - config_file=/etc/postgresql/postgresql.conf
-            ports:
-                - id: database
-                  port: 5432
-                  type: TCP
-            volumes:
-                - id: data
-                  dir: /var/lib/postgresql/data
-            instructions:
-                - type: TEXT
-                  title: Connection String
-                  content: postgresql://${POSTGRES_USERNAME}:${POSTGRES_PASSWORD}@${PORT_FORWARDED_HOSTNAME}:${DATABASE_PORT_FORWARDED_PORT}/${POSTGRES_DATABASE}
-                - type: TEXT
-                  title: PostgreSQL Connect Command
-                  content: psql "postgresql://${POSTGRES_USERNAME}:${POSTGRES_PASSWORD}@${PORT_FORWARDED_HOSTNAME}:${DATABASE_PORT_FORWARDED_PORT}/${POSTGRES_DATABASE}"
-                - type: TEXT
-                  title: PostgreSQL username
-                  content: ${POSTGRES_USERNAME}
-                  category: Credentials
-                - type: PASSWORD
-                  title: PostgresSQL password
-                  content: ${POSTGRES_PASSWORD}
-                  category: Credentials
-                - type: TEXT
-                  title: PostgresSQL database
-                  content: ${POSTGRES_DATABASE}
-                  category: Credentials
-                - type: TEXT
-                  title: PostgreSQL host
-                  content: ${PORT_FORWARDED_HOSTNAME}
-                  category: Hostname & Port
-                - type: TEXT
-                  title: PostgreSQL port
-                  content: ${DATABASE_PORT_FORWARDED_PORT}
-                  category: Hostname & Port
-            env:
-                PGDATA:
-                    default: /var/lib/postgresql/data/pgdata
-                POSTGRES_CONNECTION_STRING:
-                    default: postgresql://${POSTGRES_USERNAME}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DATABASE}
-                    expose: true
-                    readonly: true
-                POSTGRES_DATABASE:
-                    default: ${POSTGRES_DB}
-                    expose: true
-                    readonly: true
-                POSTGRES_DB:
-                    default: zeabur
-                POSTGRES_HOST:
-                    default: ${CONTAINER_HOSTNAME}
-                    expose: true
-                    readonly: true
-                POSTGRES_PASSWORD:
-                    default: ${PASSWORD}
-                    expose: true
-                POSTGRES_PORT:
-                    default: ${DATABASE_PORT}
-                    expose: true
-                    readonly: true
-                POSTGRES_URI:
-                    default: ${POSTGRES_CONNECTION_STRING}
-                    expose: true
-                    readonly: true
-                POSTGRES_USER:
-                    default: root
-                POSTGRES_USERNAME:
-                    default: ${POSTGRES_USER}
-                    expose: true
-                    readonly: true
-            configs:
-                - path: /etc/postgresql/postgresql.conf
-                  template: |
-                    # https://github.com/postgres/postgres/blob/master/src/backend/utils/misc/postgresql.conf.sample
-                    listen_addresses = '*'
-                    max_connections = 100
-                    shared_buffers = 128MB
-                    dynamic_shared_memory_type = posix
-                    max_wal_size = 1GB
-                    min_wal_size = 80MB
-                    log_timezone = 'Etc/UTC'
-                    datestyle = 'iso, mdy'
-                    timezone = 'Etc/UTC'
-                    lc_messages = 'en_US.utf8'
-                    lc_monetary = 'en_US.utf8'
-                    lc_numeric = 'en_US.utf8'
-                    lc_time = 'en_US.utf8'
-                    default_text_search_config = 'pg_catalog.english'
-        - name: Redis
-          icon: https://raw.githubusercontent.com/zeabur/service-icons/main/marketplace/redis.svg
-          template: PREBUILT
-          spec:
-            source:
-                image: redis/redis-stack-server:latest
-            ports:
-                - id: database
-                  port: 6379
-                  type: TCP
-            volumes:
-                - id: data
-                  dir: /data
-            instructions:
-                - type: TEXT
-                  title: Command to connect to your Redis
-                  content: redis-cli -h ${PORT_FORWARDED_HOSTNAME} -p ${DATABASE_PORT_FORWARDED_PORT} -a ${REDIS_PASSWORD}
-                - type: TEXT
-                  title: Redis Connection String
-                  content: redis://:${REDIS_PASSWORD}@${PORT_FORWARDED_HOSTNAME}:${DATABASE_PORT_FORWARDED_PORT}
-                - type: PASSWORD
-                  title: Redis password
-                  content: ${REDIS_PASSWORD}
-                  category: Credentials
-                - type: TEXT
-                  title: Redis host
-                  content: ${PORT_FORWARDED_HOSTNAME}
-                  category: Hostname & Port
-                - type: TEXT
-                  title: Redis port
-                  content: ${DATABASE_PORT_FORWARDED_PORT}
-                  category: Hostname & Port
-            env:
-                REDIS_ARGS:
-                    default: --requirepass ${REDIS_PASSWORD}
-                REDIS_CONNECTION_STRING:
-                    default: redis://:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}
-                    expose: true
-                    readonly: true
-                REDIS_HOST:
-                    default: ${CONTAINER_HOSTNAME}
-                    expose: true
-                    readonly: true
-                REDIS_PASSWORD:
-                    default: ${PASSWORD}
-                    expose: true
-                REDIS_PORT:
-                    default: ${DATABASE_PORT}
-                    expose: true
-                    readonly: true
-                REDIS_URI:
-                    default: ${REDIS_CONNECTION_STRING}
-                    expose: true
-                    readonly: true
-        - name: RSSHub
-          icon: https://docs.rsshub.app/logo.png
-          template: PREBUILT
-          dependencies:
-            - Redis
-          spec:
-            source:
-                image: diygod/rsshub
-            ports:
-                - id: web
-                  port: 1200
-                  type: HTTP
-            env:
-                CACHE_TYPE:
-                    default: redis
-                REDIS_URL:
-                    default: ${REDIS_URI}
-        - name: RSS3-Node-Core
-          icon: https://explorer.rss3.io/rss3.svg
-          template: PREBUILT
-          dependencies:
-            - PostgreSQL
-            - Redis
-          spec:
-            source:
-                image: ghcr.io/rss3-network/node:v1.1.1
-                command:
-                    - ./node
-                    - --module=core
-            ports:
-                - id: web
-                  port: 80
-                  type: HTTP
-            env:
-                PUBLIC_DOMAIN:
-                    default: ${ZEABUR_WEB_URL}
-                    expose: true
-                    readonly: true
-                NODE_DATABASE_URI:
-                    default: ${POSTGRES_CONNECTION_STRING}
-                NODE_DISCOVERY_OPERATOR_EVM_ADDRESS:
-                    default: ${EVM_ADDRESS}
-                NODE_DISCOVERY_OPERATOR_SIGNATURE:
-                    default: ${SIGNATURE}
-                NODE_DISCOVERY_SERVER_ACCESS_TOKEN:
-                    default: ${PASSWORD}
-                CORE_PASSWORD:
-                    default: ${PASSWORD}
-                    expose: true
-                NODE_DISCOVERY_SERVER_GLOBAL_INDEXER_ENDPOINT:
-                    default: ${GI_ENDPOINT}
-                NODE_OBSERVABILITY_OPENTELEMETRY_METRICS_ENABLE:
-                    default: "false"
-                NODE_OBSERVABILITY_OPENTELEMETRY_TRACES_ENABLE:
-                    default: "false"
-                NODE_REDIS_ENDPOINT:
-                    default: ${REDIS_HOST}:${REDIS_PORT}
-                NODE_REDIS_PASSWORD:
-                    default: ${REDIS_PASSWORD}
-                NODE_COMPONENT_RSS_ENDPOINT:
-                    default: "http://rsshub.zeabur.internal:1200"
-          domainKey: WEB_URL
-        - name: RSS3-Node-Broadcaster
-          icon: https://explorer.rss3.io/rss3.svg
-          template: PREBUILT
-          dependencies:
-            - RSS3-Node-Core
-          spec:
-            source:
-                image: ghcr.io/rss3-network/node:v1.1.1
-                command:
-                    - ./node
-                    - --module=broadcaster
-            env:
-                NODE_DISCOVERY_OPERATOR_EVM_ADDRESS:
-                    default: ${EVM_ADDRESS}
-                NODE_DISCOVERY_OPERATOR_SIGNATURE:
-                    default: ${SIGNATURE}
-                NODE_DISCOVERY_SERVER_ACCESS_TOKEN:
-                    default: ${CORE_PASSWORD}
-                NODE_DISCOVERY_SERVER_ENDPOINT:
-                    default: ${PUBLIC_DOMAIN}
-                NODE_DISCOVERY_SERVER_GLOBAL_INDEXER_ENDPOINT:
-                    default: ${GI_ENDPOINT}
-                NODE_OBSERVABILITY_OPENTELEMETRY_METRICS_ENABLE:
-                    default: "false"
-                NODE_OBSERVABILITY_OPENTELEMETRY_TRACES_ENABLE:
-                    default: "false"
-                NODE_COMPONENT_RSS_ENDPOINT:
-                    default: "http://rsshub.zeabur.internal:1200"
-        - name: RSS3-Node-Monitor
-          icon: https://explorer.rss3.io/rss3.svg
-          template: PREBUILT
-          dependencies:
-            - PostgreSQL
-            - Redis
-          spec:
-            source:
-                image: ghcr.io/rss3-network/node:v1.1.1
-                command:
-                    - ./node
-                    - --module=monitor
-            env:
-                NODE_DATABASE_URI:
-                    default: ${POSTGRES_CONNECTION_STRING}
-                NODE_REDIS_ENDPOINT:
-                    default: ${REDIS_HOST}:${REDIS_PORT}
-                NODE_REDIS_PASSWORD:
-                    default: ${REDIS_PASSWORD}
-                NODE_COMPONENT_RSS_ENDPOINT:
-                    default: "http://rsshub.zeabur.internal:1200"
-        - name: RSS3-Node-VSL-Core
-          icon: https://explorer.rss3.io/rss3.svg
-          template: PREBUILT
-          dependencies:
-            - PostgreSQL
-            - Redis
-          spec:
-            source:
-                image: ghcr.io/rss3-network/node:v1.1.1
-                command:
-                    - ./node
-                    - --worker.id=vsl-core
-            env:
-                NODE_DATABASE_URI:
-                    default: ${POSTGRES_CONNECTION_STRING}
-                NODE_OBSERVABILITY_OPENTELEMETRY_METRICS_ENABLE:
-                    default: "false"
-                NODE_OBSERVABILITY_OPENTELEMETRY_TRACES_ENABLE:
-                    default: "false"
-                NODE_REDIS_ENDPOINT:
-                    default: ${REDIS_HOST}:${REDIS_PORT}
-                NODE_REDIS_PASSWORD:
-                    default: ${REDIS_PASSWORD}
+  services:
+    - name: PostgreSQL
+      icon: https://raw.githubusercontent.com/zeabur/service-icons/main/marketplace/postgresql.svg
+      template: PREBUILT
+      spec:
+        source:
+          image: postgres:16
+          command:
+            - docker-entrypoint.sh
+            - -c
+            - config_file=/etc/postgresql/postgresql.conf
+        ports:
+          - id: database
+            port: 5432
+            type: TCP
+        volumes:
+          - id: data
+            dir: /var/lib/postgresql/data
+        instructions:
+          - type: TEXT
+            title: Connection String
+            content: postgresql://${POSTGRES_USERNAME}:${POSTGRES_PASSWORD}@${PORT_FORWARDED_HOSTNAME}:${DATABASE_PORT_FORWARDED_PORT}/${POSTGRES_DATABASE}
+          - type: TEXT
+            title: PostgreSQL Connect Command
+            content: psql "postgresql://${POSTGRES_USERNAME}:${POSTGRES_PASSWORD}@${PORT_FORWARDED_HOSTNAME}:${DATABASE_PORT_FORWARDED_PORT}/${POSTGRES_DATABASE}"
+          - type: TEXT
+            title: PostgreSQL username
+            content: ${POSTGRES_USERNAME}
+            category: Credentials
+          - type: PASSWORD
+            title: PostgresSQL password
+            content: ${POSTGRES_PASSWORD}
+            category: Credentials
+          - type: TEXT
+            title: PostgresSQL database
+            content: ${POSTGRES_DATABASE}
+            category: Credentials
+          - type: TEXT
+            title: PostgreSQL host
+            content: ${PORT_FORWARDED_HOSTNAME}
+            category: Hostname & Port
+          - type: TEXT
+            title: PostgreSQL port
+            content: ${DATABASE_PORT_FORWARDED_PORT}
+            category: Hostname & Port
+        env:
+          PGDATA:
+            default: /var/lib/postgresql/data/pgdata
+          POSTGRES_CONNECTION_STRING:
+            default: postgresql://${POSTGRES_USERNAME}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DATABASE}
+            expose: true
+            readonly: true
+          POSTGRES_DATABASE:
+            default: ${POSTGRES_DB}
+            expose: true
+            readonly: true
+          POSTGRES_DB:
+            default: zeabur
+          POSTGRES_HOST:
+            default: ${CONTAINER_HOSTNAME}
+            expose: true
+            readonly: true
+          POSTGRES_PASSWORD:
+            default: ${PASSWORD}
+            expose: true
+          POSTGRES_PORT:
+            default: ${DATABASE_PORT}
+            expose: true
+            readonly: true
+          POSTGRES_URI:
+            default: ${POSTGRES_CONNECTION_STRING}
+            expose: true
+            readonly: true
+          POSTGRES_USER:
+            default: root
+          POSTGRES_USERNAME:
+            default: ${POSTGRES_USER}
+            expose: true
+            readonly: true
+        configs:
+          - path: /etc/postgresql/postgresql.conf
+            template: |
+              # https://github.com/postgres/postgres/blob/master/src/backend/utils/misc/postgresql.conf.sample
+              listen_addresses = '*'
+              max_connections = 100
+              shared_buffers = 128MB
+              dynamic_shared_memory_type = posix
+              max_wal_size = 1GB
+              min_wal_size = 80MB
+              log_timezone = 'Etc/UTC'
+              datestyle = 'iso, mdy'
+              timezone = 'Etc/UTC'
+              lc_messages = 'en_US.utf8'
+              lc_monetary = 'en_US.utf8'
+              lc_numeric = 'en_US.utf8'
+              lc_time = 'en_US.utf8'
+              default_text_search_config = 'pg_catalog.english'
+    - name: Redis
+      icon: https://raw.githubusercontent.com/zeabur/service-icons/main/marketplace/redis.svg
+      template: PREBUILT
+      spec:
+        source:
+          image: redis/redis-stack-server:latest
+        ports:
+          - id: database
+            port: 6379
+            type: TCP
+        volumes:
+          - id: data
+            dir: /data
+        instructions:
+          - type: TEXT
+            title: Command to connect to your Redis
+            content: redis-cli -h ${PORT_FORWARDED_HOSTNAME} -p ${DATABASE_PORT_FORWARDED_PORT} -a ${REDIS_PASSWORD}
+          - type: TEXT
+            title: Redis Connection String
+            content: redis://:${REDIS_PASSWORD}@${PORT_FORWARDED_HOSTNAME}:${DATABASE_PORT_FORWARDED_PORT}
+          - type: PASSWORD
+            title: Redis password
+            content: ${REDIS_PASSWORD}
+            category: Credentials
+          - type: TEXT
+            title: Redis host
+            content: ${PORT_FORWARDED_HOSTNAME}
+            category: Hostname & Port
+          - type: TEXT
+            title: Redis port
+            content: ${DATABASE_PORT_FORWARDED_PORT}
+            category: Hostname & Port
+        env:
+          REDIS_ARGS:
+            default: --requirepass ${REDIS_PASSWORD}
+          REDIS_CONNECTION_STRING:
+            default: redis://:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}
+            expose: true
+            readonly: true
+          REDIS_HOST:
+            default: ${CONTAINER_HOSTNAME}
+            expose: true
+            readonly: true
+          REDIS_PASSWORD:
+            default: ${PASSWORD}
+            expose: true
+          REDIS_PORT:
+            default: ${DATABASE_PORT}
+            expose: true
+            readonly: true
+          REDIS_URI:
+            default: ${REDIS_CONNECTION_STRING}
+            expose: true
+            readonly: true
+    - name: RSSHub
+      icon: https://docs.rsshub.app/logo.png
+      template: PREBUILT
+      dependencies:
+        - Redis
+      spec:
+        source:
+          image: diygod/rsshub
+        ports:
+          - id: web
+            port: 1200
+            type: HTTP
+        env:
+          CACHE_TYPE:
+            default: redis
+          REDIS_URL:
+            default: ${REDIS_URI}
+    - name: RSS3-Node-Core
+      icon: https://explorer.rss3.io/rss3.svg
+      template: PREBUILT
+      dependencies:
+        - PostgreSQL
+        - Redis
+      spec:
+        source:
+          image: ghcr.io/rss3-network/node:v1.2.0
+          command:
+            - ./node
+            - --module=core
+        ports:
+          - id: web
+            port: 80
+            type: HTTP
+        env:
+          PUBLIC_DOMAIN:
+            default: ${ZEABUR_WEB_URL}
+            expose: true
+            readonly: true
+          NODE_DATABASE_URI:
+            default: ${POSTGRES_CONNECTION_STRING}
+          NODE_DISCOVERY_OPERATOR_EVM_ADDRESS:
+            default: ${EVM_ADDRESS}
+          NODE_DISCOVERY_OPERATOR_SIGNATURE:
+            default: ${SIGNATURE}
+          NODE_DISCOVERY_SERVER_ACCESS_TOKEN:
+            default: ${PASSWORD}
+          CORE_PASSWORD:
+            default: ${PASSWORD}
+            expose: true
+          NODE_DISCOVERY_SERVER_GLOBAL_INDEXER_ENDPOINT:
+            default: ${GI_ENDPOINT}
+          NODE_OBSERVABILITY_OPENTELEMETRY_METRICS_ENABLE:
+            default: "false"
+          NODE_OBSERVABILITY_OPENTELEMETRY_TRACES_ENABLE:
+            default: "false"
+          NODE_REDIS_ENDPOINT:
+            default: ${REDIS_HOST}:${REDIS_PORT}
+          NODE_REDIS_PASSWORD:
+            default: ${REDIS_PASSWORD}
+          NODE_COMPONENT_RSS_ENDPOINT:
+            default: "http://rsshub.zeabur.internal:1200"
+      domainKey: WEB_URL
+    - name: RSS3-Node-Broadcaster
+      icon: https://explorer.rss3.io/rss3.svg
+      template: PREBUILT
+      dependencies:
+        - RSS3-Node-Core
+      spec:
+        source:
+          image: ghcr.io/rss3-network/node:v1.2.0
+          command:
+            - ./node
+            - --module=broadcaster
+        env:
+          NODE_DISCOVERY_OPERATOR_EVM_ADDRESS:
+            default: ${EVM_ADDRESS}
+          NODE_DISCOVERY_OPERATOR_SIGNATURE:
+            default: ${SIGNATURE}
+          NODE_DISCOVERY_SERVER_ACCESS_TOKEN:
+            default: ${CORE_PASSWORD}
+          NODE_DISCOVERY_SERVER_ENDPOINT:
+            default: ${PUBLIC_DOMAIN}
+          NODE_DISCOVERY_SERVER_GLOBAL_INDEXER_ENDPOINT:
+            default: ${GI_ENDPOINT}
+          NODE_OBSERVABILITY_OPENTELEMETRY_METRICS_ENABLE:
+            default: "false"
+          NODE_OBSERVABILITY_OPENTELEMETRY_TRACES_ENABLE:
+            default: "false"
+          NODE_COMPONENT_RSS_ENDPOINT:
+            default: "http://rsshub.zeabur.internal:1200"
+    - name: RSS3-Node-Monitor
+      icon: https://explorer.rss3.io/rss3.svg
+      template: PREBUILT
+      dependencies:
+        - PostgreSQL
+        - Redis
+      spec:
+        source:
+          image: ghcr.io/rss3-network/node:v1.2.0
+          command:
+            - ./node
+            - --module=monitor
+        env:
+          NODE_DATABASE_URI:
+            default: ${POSTGRES_CONNECTION_STRING}
+          NODE_REDIS_ENDPOINT:
+            default: ${REDIS_HOST}:${REDIS_PORT}
+          NODE_REDIS_PASSWORD:
+            default: ${REDIS_PASSWORD}
+          NODE_COMPONENT_RSS_ENDPOINT:
+            default: "http://rsshub.zeabur.internal:1200"
+    - name: RSS3-Node-VSL-Core
+      icon: https://explorer.rss3.io/rss3.svg
+      template: PREBUILT
+      dependencies:
+        - PostgreSQL
+        - Redis
+      spec:
+        source:
+          image: ghcr.io/rss3-network/node:v1.2.0
+          command:
+            - ./node
+            - --worker.id=vsl-core
+        env:
+          NODE_DATABASE_URI:
+            default: ${POSTGRES_CONNECTION_STRING}
+          NODE_OBSERVABILITY_OPENTELEMETRY_METRICS_ENABLE:
+            default: "false"
+          NODE_OBSERVABILITY_OPENTELEMETRY_TRACES_ENABLE:
+            default: "false"
+          NODE_REDIS_ENDPOINT:
+            default: ${REDIS_HOST}:${REDIS_PORT}
+          NODE_REDIS_PASSWORD:
+            default: ${REDIS_PASSWORD}
