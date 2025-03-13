@@ -24,38 +24,6 @@ spec:
       type: STRING
       name: What is your global indexer endpoint?
       description: Used for the global indexer endpoint for your node.
-    - key: OPENAI_API_KEY
-      type: STRING
-      name: What is your OpenAI API key?
-      description: Used for AI capabilities in the AgentData service (optional).
-    - key: OLLAMA_HOST
-      type: STRING
-      name: What is your Ollama host?
-      description: Used for local model hosting in the AgentData service (optional).
-    - key: TWITTER_BEARER_TOKEN
-      type: STRING
-      name: What is your Twitter bearer token?
-      description: Used for Twitter integration in the AgentData service (optional).
-    - key: TWITTER_API_KEY
-      type: STRING
-      name: What is your Twitter API key?
-      description: Used for Twitter integration in the AgentData service (optional).
-    - key: TWITTER_API_SECRET
-      type: STRING
-      name: What is your Twitter API secret?
-      description: Used for Twitter integration in the AgentData service (optional).
-    - key: TWITTER_ACCESS_TOKEN
-      type: STRING
-      name: What is your Twitter access token?
-      description: Used for Twitter integration in the AgentData service (optional).
-    - key: TWITTER_ACCESS_TOKEN_SECRET
-      type: STRING
-      name: What is your Twitter access token secret?
-      description: Used for Twitter integration in the AgentData service (optional).
-    - key: KAITO_API_TOKEN
-      type: STRING
-      name: What is your Kaito API token?
-      description: Used for additional integration in the AgentData service (optional).
   tags:
     - web3
   readme: |
@@ -74,20 +42,6 @@ spec:
     - **Global Indexer Endpoint**: The global indexer endpoint for your node. (You can use the default value.)
 
     After the service starts, it will join the RSS3 Network as a lightweight RSS3 Node.
-
-    ## AI Agent Integration
-
-    The template now includes the AgentData service, which provides AI capabilities to your RSS3 Node:
-
-    - The AgentData service is automatically connected to your node components
-    - All AI-related API keys are **optional**
-    - If you want to enable AI capabilities, you can provide any of the following:
-      - **OpenAI API Key**: For accessing OpenAI models
-      - **Ollama Host**: For local model hosting
-      - **Twitter API Credentials**: For Twitter data integration
-      - **Kaito API Token**: For additional data integrations
-
-    AI capabilities enhance your node with intelligent data processing, content generation, and advanced analytics.
 
     ## Contact
 
@@ -364,22 +318,6 @@ spec:
         env:
           DB_CONNECTION:
             default: ${AGENT_DATA_POSTGRES_CONNECTION_STRING}
-          OPENAI_API_KEY:
-            default: ${OPENAI_API_KEY}
-          OLLAMA_HOST:
-            default: ${OLLAMA_HOST}
-          TWITTER_BEARER_TOKEN:
-            default: ${TWITTER_BEARER_TOKEN}
-          TWITTER_API_KEY:
-            default: ${TWITTER_API_KEY}
-          TWITTER_API_SECRET:
-            default: ${TWITTER_API_SECRET}
-          TWITTER_ACCESS_TOKEN:
-            default: ${TWITTER_ACCESS_TOKEN}
-          TWITTER_ACCESS_TOKEN_SECRET:
-            default: ${TWITTER_ACCESS_TOKEN_SECRET}
-          KAITO_API_TOKEN:
-            default: ${KAITO_API_TOKEN}
     - name: RSS3-Node-Core
       icon: https://explorer.rss3.io/rss3.svg
       template: PREBUILT
