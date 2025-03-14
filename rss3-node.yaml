@@ -327,7 +327,7 @@ spec:
         - AgentData
       spec:
         source:
-          image: ghcr.io/rss3-network/node:v1.2.0
+          image: ghcr.io/rss3-network/node:main-f8b4bc1
           command:
             - ./node
             - --module=core
@@ -363,7 +363,7 @@ spec:
             default: ${REDIS_PASSWORD}
           NODE_COMPONENT_RSS_ENDPOINT:
             default: "http://rsshub.zeabur.internal:1200"
-          NODE_COMPONENT_AGENT_ENDPOINT:
+          NODE_COMPONENT_AI_ENDPOINT:
             default: "http://agentdata.zeabur.internal:8887"
       domainKey: WEB_URL
     - name: RSS3-Node-Broadcaster
@@ -374,7 +374,7 @@ spec:
         - AgentData
       spec:
         source:
-          image: ghcr.io/rss3-network/node:v1.2.0
+          image: ghcr.io/rss3-network/node:main-f8b4bc1
           command:
             - ./node
             - --module=broadcaster
@@ -395,7 +395,7 @@ spec:
             default: "false"
           NODE_COMPONENT_RSS_ENDPOINT:
             default: "http://rsshub.zeabur.internal:1200"
-          NODE_COMPONENT_AGENT_ENDPOINT:
+          NODE_COMPONENT_AI_ENDPOINT:
             default: "http://agentdata.zeabur.internal:8887"
     - name: RSS3-Node-Monitor
       icon: https://explorer.rss3.io/rss3.svg
@@ -406,7 +406,7 @@ spec:
         - AgentData
       spec:
         source:
-          image: ghcr.io/rss3-network/node:v1.2.0
+          image: ghcr.io/rss3-network/node:main-f8b4bc1
           command:
             - ./node
             - --module=monitor
@@ -419,28 +419,5 @@ spec:
             default: ${REDIS_PASSWORD}
           NODE_COMPONENT_RSS_ENDPOINT:
             default: "http://rsshub.zeabur.internal:1200"
-          NODE_COMPONENT_AGENT_ENDPOINT:
+          NODE_COMPONENT_AI_ENDPOINT:
             default: "http://agentdata.zeabur.internal:8887"
-    - name: RSS3-Node-VSL-Core
-      icon: https://explorer.rss3.io/rss3.svg
-      template: PREBUILT
-      dependencies:
-        - PostgreSQL
-        - Redis
-      spec:
-        source:
-          image: ghcr.io/rss3-network/node:v1.2.0
-          command:
-            - ./node
-            - --worker.id=vsl-core
-        env:
-          NODE_DATABASE_URI:
-            default: ${POSTGRES_CONNECTION_STRING}
-          NODE_OBSERVABILITY_OPENTELEMETRY_METRICS_ENABLE:
-            default: "false"
-          NODE_OBSERVABILITY_OPENTELEMETRY_TRACES_ENABLE:
-            default: "false"
-          NODE_REDIS_ENDPOINT:
-            default: ${REDIS_HOST}:${REDIS_PORT}
-          NODE_REDIS_PASSWORD:
-            default: ${REDIS_PASSWORD}
