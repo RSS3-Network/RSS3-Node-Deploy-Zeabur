@@ -102,7 +102,7 @@ spec:
             default: ${REDIS_CONNECTION_STRING}
             expose: true
             readonly: true
-    - name: AgentDataDB
+    - name: PostgreSQL
       icon: https://raw.githubusercontent.com/zeabur/service-icons/main/marketplace/postgresql.svg
       template: PREBUILT
       spec:
@@ -149,26 +149,37 @@ spec:
         env:
           PGDATA:
             default: /var/lib/postgresql/data/pgdata
-          AGENT_DATA_POSTGRES_CONNECTION_STRING:
+          POSTGRES_CONNECTION_STRING:
             default: postgresql://${POSTGRES_USERNAME}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DATABASE}
             expose: true
             readonly: true
           POSTGRES_DATABASE:
             default: ${POSTGRES_DB}
+            expose: true
+            readonly: true
           POSTGRES_DB:
-            default: agent_data
+            default: zeabur
           POSTGRES_HOST:
             default: ${CONTAINER_HOSTNAME}
+            expose: true
+            readonly: true
           POSTGRES_PASSWORD:
             default: ${PASSWORD}
+            expose: true
           POSTGRES_PORT:
             default: ${DATABASE_PORT}
+            expose: true
+            readonly: true
           POSTGRES_URI:
             default: ${POSTGRES_CONNECTION_STRING}
+            expose: true
+            readonly: true
           POSTGRES_USER:
             default: root
           POSTGRES_USERNAME:
             default: ${POSTGRES_USER}
+            expose: true
+            readonly: true
         configs:
           - path: /etc/postgresql/postgresql.conf
             template: |
@@ -187,6 +198,8 @@ spec:
               lc_numeric = 'en_US.utf8'
               lc_time = 'en_US.utf8'
               default_text_search_config = 'pg_catalog.english'
+            permission: null
+            envsubst: null
     - name: RSSHub
       icon: https://docs.rsshub.app/logo.png
       template: PREBUILT
@@ -208,7 +221,7 @@ spec:
       icon: https://avatars.githubusercontent.com/u/184013737?s=200&v=4
       template: PREBUILT
       dependencies:
-        - AgentDataDB
+        - PostgreSQL
       spec:
         source:
           image: ghcr.io/rss3-network/agentdata
@@ -221,7 +234,7 @@ spec:
             dir: /agent_data
         env:
           DB_CONNECTION:
-            default: ${AGENT_DATA_POSTGRES_CONNECTION_STRING}
+            default: ${POSTGRES_CONNECTION_STRING}
     - name: RSS3-Node-Core
       icon: https://explorer.rss3.io/rss3.svg
       template: PREBUILT
