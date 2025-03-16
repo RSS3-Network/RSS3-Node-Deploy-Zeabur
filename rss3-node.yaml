@@ -243,7 +243,7 @@ spec:
         - AgentData
       spec:
         source:
-          image: ghcr.io/rss3-network/node:main-432811c
+          image: ghcr.io/rss3-network/node:2.0.0-rc
           command:
             - ./node
             - --module=core
@@ -288,7 +288,7 @@ spec:
         - AgentData
       spec:
         source:
-          image: ghcr.io/rss3-network/node:main-432811c
+          image: ghcr.io/rss3-network/node:2.0.0-rc
           command:
             - ./node
             - --module=broadcaster
@@ -319,7 +319,7 @@ spec:
         - AgentData
       spec:
         source:
-          image: ghcr.io/rss3-network/node:main-432811c
+          image: ghcr.io/rss3-network/node:2.0.0-rc
           command:
             - ./node
             - --module=monitor
