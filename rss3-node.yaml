@@ -229,9 +229,6 @@ spec:
           - id: web
             port: 8887
             type: HTTP
-        volumes:
-          - id: data
-            dir: /agent_data
         env:
           DB_CONNECTION:
             default: ${POSTGRES_CONNECTION_STRING}
