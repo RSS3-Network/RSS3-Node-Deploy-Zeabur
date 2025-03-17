@@ -224,7 +224,7 @@ spec:
         - PostgreSQL
       spec:
         source:
-          image: ghcr.io/rss3-network/agentdata
+          image: ghcr.io/rss3-network/agentdata:0.1.0
         ports:
           - id: web
             port: 8887
@@ -240,7 +240,7 @@ spec:
         - AgentData
       spec:
         source:
-          image: ghcr.io/rss3-network/node:2.0.0-rc
+          image: ghcr.io/rss3-network/node:2.0.0
           command:
             - ./node
             - --module=core
@@ -285,7 +285,7 @@ spec:
         - AgentData
       spec:
         source:
-          image: ghcr.io/rss3-network/node:2.0.0-rc
+          image: ghcr.io/rss3-network/node:2.0.0
           command:
             - ./node
             - --module=broadcaster
@@ -316,7 +316,7 @@ spec:
         - AgentData
       spec:
         source:
-          image: ghcr.io/rss3-network/node:2.0.0-rc
+          image: ghcr.io/rss3-network/node:2.0.0
           command:
             - ./node
             - --module=monitor
